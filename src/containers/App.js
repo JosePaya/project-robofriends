@@ -1,17 +1,28 @@
-import React from 'react'
-import CardList from '../components/CardList'
-import SearchBox from '../components/SearchBox'
-import './App.css'
-import Scroll from '../components/Scroll'
-import ErrorBoundary from '../components/ErrorBoundary'
+import React from 'react';
+import CardList from '../components/CardList';
+import SearchBox from '../components/SearchBox';
+import './App.css';
+import Scroll from '../components/Scroll';
+import ErrorBoundary from '../components/ErrorBoundary';
+import { connect } from 'react-redux';
+import { setSearchField } from '../actions'
+
+const mapStateToProps = state => {
+    return { searchField: state.searchField };
+}
+
+const mapDispatchtoProps = dispatch => {
+    return {
+        onSearchChange: (event) => dispatch(setSearchField(event.target.value))
+    }
+}
 
 class App extends React.Component {
     
     constructor() {
         super()
         this.state = {
-            robots: [],
-            searchField: '' 
+            robots: []
         }
     }
 
@@ -22,14 +33,10 @@ class App extends React.Component {
             .then(users => this.setState({ robots: users }));
     }
 
-    // Events that bubble up from the SearchBox component
-    onSearchChange = (event) => {
-        this.setState({ searchField: event.target.value });
-    }
-
     render() {
         // Render the filtered version of the robots array
-        const { robots, searchField } = this.state;
+        const { robots } = this.state;
+        const { searchField, onSearchChange } = this.props;
         const filteredRobots = robots.filter(robot => {
             // return robot.name.toLowerCase().includes(this.state.searchField.toLowerCase())
             return robot.name.toLowerCase().includes(searchField.toLowerCase())
@@ -41,7 +48,7 @@ class App extends React.Component {
             return (
                 <div className='tc'>
                     <h1 className="f1 fl w-100 ma10">Robofriends</h1>
-                    <SearchBox searchChange={this.onSearchChange}/>
+                    <SearchBox searchChange={onSearchChange}/>
                     <Scroll>
                         {/* Error handler wrapping the list of cards */}
                         <ErrorBoundary>
@@ -54,4 +61,4 @@ class App extends React.Component {
     }
 }
 
-export default App;
+export default connect(mapStateToProps, mapDispatchtoProps)(App);
